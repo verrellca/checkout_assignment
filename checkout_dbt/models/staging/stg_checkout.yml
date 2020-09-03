@@ -1,0 +1,43 @@
+version: 2
+
+models:
+
+  - name: stg_users_extract 
+    columns:
+      - name: id
+        description: Surrogate key
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: Identifier for user
+        tests:
+          - not_null
+      - name: postcode
+        description: Postcode of the user 
+      - name: created_at
+        description: Time at which the user signs up
+      - name: updated_at
+        description: Time at which the row was updated
+      - name: loader_ingestion_time
+        description: Time at which the data was loaded into bigquery
+
+  - name: stg_pageviews_extract 
+    tests:
+      - dbt_utils.equal_rowcount:
+              compare_model: source('checkout', 'pageviews_extract')
+    columns:
+      - name: pageviews_user_id
+        description: Identifier of the  user / foreign key to users_extract.id 
+        tests:
+          - not_null
+      - name: web_page
+        description: URL of the page visited 
+      - name: event_id
+        description: Identifier of the event
+        tests:
+          - unique
+      - name: event_time 
+        description: Time at which the pegeview event occured
+      - name: loader_ingestion_time
+        description: Time at which the data  was loaded into bigquery 

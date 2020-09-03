@@ -1,0 +1,25 @@
+name: 'checkout'
+version: '1.0.0'
+
+profile: 'checkout_gcp'
+
+source-paths: ["models"]
+test-paths: ["tests"]
+
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
+    - "target"
+    - "dbt_modules"
+    - "logs"
+
+models:
+  checkout:
+    staging:
+      stg_users_extract:
+        enabled: true
+      stg_pageviews_extract:
+        enabled: true
+
+    marts:
+      user_pageviews:
+        enabled: true

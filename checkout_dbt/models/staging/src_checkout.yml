@@ -1,0 +1,54 @@
+version: 2
+
+sources:
+  - name: checkout
+    description: A collection of the checkout tables
+    database: "{{ env_var('BIGQUERY_PROJECT', 'checkout-production-data-0') }}" # gcp project
+    schema: "{{ env_var('BIGQUERY_DATASET_SOURCES', 'checkout_sources') }}" # bigquery dataset
+
+    tags:
+      - checkout
+
+    tables:
+      - name: users_extract
+        freshness:
+          warn_after: {count: 36, period: hour}  # data is extracted daily at midnight therefore we should be warned if no new data is ingested after 36 hours
+          error_after: {count: 48, period: hour}
+        loaded_at_field: loader_ingestion_date
+        description: User table
+        columns:
+          - name: id 
+            description: Identifier of the  user 
+            tests:
+              - not_null
+          - name: postcode
+            description: Postcode of the user
+          - name: created_at
+            description: Time at which the user signs up
+          - name: updated_at
+            description: Time at which the row was updated # in the case of the user changing postcode we want to track the time at which it updated to understand historical changes over time
+          - name: loader_ingestion_time
+            description: Time at which the data  was loaded into bigquery # each time the extract process runs it should contain the timestamp at which it runs - in this case at midnight daily
+
+    tables:
+      - name: pageviews_extract
+        freshness:
+          warn_after: {count: 2, period: hour} # data is extracted every hour therefore we should be warned if no new data is ingested after 2 hours
+          error_after: {count: 12, period: hour}
+        loaded_at_field: loader_ingestion_date
+        description: User table
+        columns:
+          - name: user_id 
+            description: Identifier of the  user / foreign key to users_extract.id
+            tests:
+              - not_null
+          - name: url
+            description: URL of the page visited
+          - name: event_id
+            description: Identifier of the event
+            tests:
+              - unique
+          - name: event_time
+            description: Time at which the pegeview event occured
+          - name: loader_ingestion_time
+            description: Time at which the data  was loaded into bigquery 

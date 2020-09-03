@@ -15,7 +15,7 @@ WITH user_current AS (
         , ROW_NUMBER() OVER (PARTITION_BY loader_ingestion_time DESC) AS row_num
 
 
-    FROM {{ ref('stg_users_extract') }}           AS stg_users_extract
+        FROM {{ ref('stg_users_extract') }}           AS stg_users_extract
 
 ),
 
@@ -27,7 +27,7 @@ WITH user_current AS (
         , postcode
         , loader_ingestion_time
 
-    FROM {{ ref('stg_users_extract') }}           AS stg_users_extract
+        FROM {{ ref('stg_users_extract') }}           AS stg_users_extract
 
 	),
 
